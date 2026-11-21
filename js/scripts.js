@@ -5,7 +5,7 @@
 const CONFIG_TIENDA = {
     // IMPORTANTE: Escribe el número con código de país, sin el símbolo '+' ni espacios.
     // Ejemplo Nicaragua: 50588888888 | Ejemplo México: 5215512345678
-    whatsappNumero: "50500000000",
+    whatsappNumero: "+50586814778",
     mensajeGeneral: "Hola Casa de las Pinturas, me gustaría recibir asesoría y cotizar unos productos."
 };
 
