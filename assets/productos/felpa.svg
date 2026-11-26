@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 400" role="img" aria-label="Ilustración de rodillo con felpa">
+  <rect width="600" height="400" fill="#F0F9FF"/>
+  <g transform="translate(300 200) scale(0.78) translate(-300 -200)">
+  <ellipse cx="300" cy="358" rx="120" ry="10" fill="#075985" opacity="0.12"/>
+  <rect x="170" y="70" width="240" height="96" rx="30" fill="#FFFFFF" stroke="#94A3B8" stroke-width="5"/>
+  <path d="M200 90v56M230 82v72M260 90v56M290 82v72M320 90v56M350 82v72M380 90v56" stroke="#CBD5E1" stroke-width="6" stroke-linecap="round" stroke-dasharray="2 14"/>
+  <rect x="156" y="102" width="18" height="32" rx="6" fill="#475569"/>
+  <rect x="406" y="102" width="18" height="32" rx="6" fill="#475569"/>
+  <path d="M424 118h24c9 0 14 5 14 14v52c0 8-5 12-12 14l-138 22c-8 2-12 6-12 14v26" fill="none" stroke="#475569" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>
+  <rect x="280" y="252" width="40" height="100" rx="16" fill="#F97316"/>
+  <path d="M288 284h24M288 300h24M288 316h24" stroke="#C2410C" stroke-width="5" stroke-linecap="round"/>
+  </g>
+</svg>

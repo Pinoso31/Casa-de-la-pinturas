@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 400" role="img" aria-label="Ilustración de brocha">
+  <rect width="600" height="400" fill="#ECFDF5"/>
+  <g transform="translate(300 200) scale(0.78) translate(-300 -200)">
+  <ellipse cx="300" cy="360" rx="120" ry="10" fill="#065F46" opacity="0.12"/>
+  <g transform="rotate(35 300 200)">
+    <path d="M283 42c0-23 34-23 34 0l6 122c1 12 25 16 25 34H252c0-18 24-22 25-34z" fill="#D97706"/>
+    <circle cx="300" cy="52" r="8" fill="#ECFDF5"/>
+    <rect x="248" y="196" width="104" height="50" rx="4" fill="#CBD5E1" stroke="#94A3B8" stroke-width="3"/>
+    <path d="M248 212h104M248 230h104" stroke="#94A3B8" stroke-width="3"/>
+    <path d="M250 246h100l8 92-14-8-10 18-14-12-14 14-14-14-16 12-12-14-18 8z" fill="#78350F"/>
+    <path d="M270 252v66M290 252v78M310 252v70M330 252v62" stroke="#A16207" stroke-width="3" stroke-linecap="round"/>
+  </g>
+  </g>
+</svg>

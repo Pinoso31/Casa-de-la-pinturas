@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 400" role="img" aria-label="Ilustración de cubeta de pintura vinílica">
+  <rect width="600" height="400" fill="#EFF6FF"/>
+  <g transform="translate(300 200) scale(0.78) translate(-300 -200)">
+  <ellipse cx="300" cy="346" rx="150" ry="14" fill="#0D47A1" opacity="0.12"/>
+  <path d="M196 120C196 40 404 40 404 120" fill="none" stroke="#94A3B8" stroke-width="8" stroke-linecap="round"/>
+  <path d="M188 112h224l-20 220c-1 10-9 16-19 16H227c-10 0-18-6-19-16z" fill="#FFFFFF" stroke="#CBD5E1" stroke-width="4"/>
+  <rect x="178" y="98" width="244" height="24" rx="8" fill="#E2E8F0" stroke="#CBD5E1" stroke-width="4"/>
+  <path d="M198 168h204l-10 116H208z" fill="#0D47A1"/>
+  <circle cx="300" cy="206" r="20" fill="#38BDF8"/>
+  <path d="M300 186c12 15 20 24 20 33a20 20 0 0 1-40 0c0-9 8-18 20-33z" fill="#FFFFFF"/>
+  <text x="300" y="263" text-anchor="middle" font-family="Arial, sans-serif" font-size="27" font-weight="700" fill="#FFFFFF">VINÍLICA</text>
+  <rect x="204" y="296" width="192" height="8" rx="4" fill="#0284C7"/>
+  </g>
+</svg>
