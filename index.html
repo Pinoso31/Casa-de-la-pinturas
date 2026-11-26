@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Casa de las Pinturas: Todo en pinturas anticorrosivas, látex, esmaltes sintéticos, selladores y diluyentes de alta calidad para tus proyectos.">
+    <meta name="description" content="Casa de las Pinturas, Managua: recubrimientos arquitectónicos e industriales, acabados para madera y metal, y herramientas. Arma tu pre-cotización y envíala por WhatsApp.">
     <title>Casa de las Pinturas</title>
     
     <!-- Favicon utilizando el logo del negocio -->
@@ -12,8 +12,10 @@
     <!-- Tipografía moderna de Google Fonts (Plus Jakarta Sans) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    
+    <!-- media="print" + onload: la fuente no retrasa el catálogo si la red está lenta -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+    <noscript><link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet"></noscript>
+
     <!-- Enlace a nuestra hoja de estilos CSS -->
     <link rel="stylesheet" href="css/styles.css">
 </head>
@@ -29,13 +31,6 @@
                 <span class="navbar__title">Casa de las <span>Pinturas</span></span>
             </a>
 
-            <!-- Botón menú hamburguesa para móviles -->
-            <button class="navbar__toggle" id="mobile-menu-btn" aria-label="Abrir menú de navegación" aria-expanded="false">
-                <span class="bar"></span>
-                <span class="bar"></span>
-                <span class="bar"></span>
-            </button>
-
             <!-- Enlaces de navegación -->
             <nav class="navbar__menu" id="navbar-menu">
                 <ul class="navbar__list">
@@ -43,10 +38,28 @@
                     <li><a href="#productos" class="navbar__link">Productos</a></li>
                     <li><a href="#contacto" class="navbar__link">Contacto</a></li>
                     <li>
-                        <a href="#contacto" class="btn btn--primary btn--sm">Cotizar ahora</a>
+                        <a href="#productos" class="btn btn--primary btn--sm" data-cotizar>Cotizar ahora</a>
                     </li>
                 </ul>
             </nav>
+
+            <!-- Botón de la lista de pre-cotización (visible en todo momento) -->
+            <button type="button" class="cart-button" id="cart-button" aria-label="Abrir pre-cotización" aria-controls="cart-drawer" aria-expanded="false">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <rect x="8" y="2" width="8" height="4" rx="1"></rect>
+                    <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path>
+                    <path d="M9 12h6M9 16h6"></path>
+                </svg>
+                <span class="cart-button__text">Mi lista</span>
+                <span class="cart-button__count" id="cart-count" hidden>0</span>
+            </button>
+
+            <!-- Botón menú hamburguesa para móviles -->
+            <button type="button" class="navbar__toggle" id="mobile-menu-btn" aria-label="Abrir menú de navegación" aria-expanded="false">
+                <span class="bar"></span>
+                <span class="bar"></span>
+                <span class="bar"></span>
+            </button>
         </div>
     </header>
 
@@ -67,13 +80,13 @@
 
             <div class="container hero__container">
                 <div class="hero__content">
-                    <span class="hero__badge">Calidad profesional en cada brocha</span>
-                    <h1 class="hero__title">Tu vision, nuestros <span class="text-multicolor">colores</span></h1>
+                    <span class="hero__badge">Bodega de pinturas en Managua</span>
+                    <h1 class="hero__title">Pinturas y recubrimientos para cada <span class="text-multicolor">superficie</span></h1>
                     <p class="hero__description">
-                        En <strong class="highlight-brand">Casa de las Pinturas</strong> contamos con <span class="highlight-key">recubrimientos de alto rendimiento</span> para interiores, exteriores, metal y madera. <span class="highlight-accent">Asesoría experta</span> y los mejores acabados para tu hogar o proyecto.
+                        En <strong class="highlight-brand">Casa de las Pinturas</strong> encuentras <span class="highlight-key">recubrimientos arquitectónicos e industriales</span>, acabados para madera y metal, y las herramientas para aplicarlos. Colores de línea envasados y <span class="highlight-accent">asesoría experta</span> para tu hogar o proyecto.
                     </p>
                     <div class="hero__actions">
-                        <a href="#productos" class="btn btn--primary">Ver nuestros productos</a>
+                        <a href="#productos" class="btn btn--primary">Ver catálogo y cotizar</a>
                         <a href="https://maps.app.goo.gl/tfpVGbuUZxnKZgyK8" id="hero-map-btn" target="_blank" rel="noopener noreferrer" class="btn btn--outline">
                             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                                 <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
@@ -82,6 +95,23 @@
                             Ubicar tienda
                         </a>
                     </div>
+
+                    <!-- Accesos rápidos a las líneas del catálogo -->
+                    <nav class="hero__lines" aria-label="Explorar el catálogo por línea">
+                        <a href="#productos" class="line-chip" data-filtrar="vinilicas"><i style="background-color: #0284C7;"></i>Vinílicas / Agua</a>
+                        <a href="#productos" class="line-chip" data-filtrar="esmaltes"><i style="background-color: #F97316;"></i>Aceite / Esmaltes</a>
+                        <a href="#productos" class="line-chip" data-filtrar="anticorrosivos"><i style="background-color: #991B1B;"></i>Anticorrosivos</a>
+                        <a href="#productos" class="line-chip" data-filtrar="herramientas"><i style="background-color: #10B981;"></i>Brochas y Felpas</a>
+                    </nav>
+
+                    <!-- Incentivo por visita a la tienda -->
+                    <aside class="perk">
+                        <span class="perk__icon" aria-hidden="true">%</span>
+                        <div>
+                            <strong>Descuento especial al visitarnos y retirar en tienda</strong>
+                            <p>4c. de la Clínica Don Bosco al Este, 20 vrs al Sur, Managua.</p>
+                        </div>
+                    </aside>
                 </div>
 
                 <div class="hero__visual">
@@ -95,8 +125,8 @@
                         <div class="hero__floating-card">
                             <img src="assets/LogoHousePaint.png" alt="Emblema Casa de las Pinturas">
                             <div>
-                                <strong>Asesoría Especializada</strong>
-                                <span>Colores a tu medida</span>
+                                <strong>Colores de línea</strong>
+                                <span>Envasados y listos para llevar</span>
                             </div>
                         </div>
                     </div>
@@ -110,16 +140,41 @@
         <section class="products section" id="productos">
             <div class="container">
                 <div class="section__header">
-                    <span class="section__subtitle">Catálogo Disponible</span>
+                    <span class="section__subtitle">Catálogo y pre-cotización</span>
                     <h2 class="section__title">Nuestros Productos</h2>
                     <p class="section__description">
-                        Selecciona el recubrimiento ideal para tu proyecto y consulta disponibilidad o realiza tu pedido directamente por WhatsApp.
+                        Elige presentación y cantidad, agrega a tu lista y envíala por WhatsApp. Te respondemos con precios y disponibilidad.
                     </p>
                 </div>
 
-                <!-- Contenedor dinámico: Los productos se cargan desde js/scripts.js -->
-                <div class="products__grid" id="products-grid">
-                    <!-- Las tarjetas se renderizan automáticamente aquí -->
+                <!-- Buscador y filtros -->
+                <div class="catalog__toolbar">
+                    <div class="catalog__search">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true">
+                            <circle cx="11" cy="11" r="7"></circle>
+                            <path d="m20 20-3.5-3.5"></path>
+                        </svg>
+                        <input type="search" id="catalog-search" placeholder="Buscar por nombre o clave" aria-label="Buscar productos por nombre o clave" autocomplete="off">
+                    </div>
+                    <div class="catalog__tabs" id="catalog-tabs" role="group" aria-label="Filtrar por línea"></div>
+                </div>
+
+                <div class="catalog__meta">
+                    <span id="catalog-count" role="status"></span>
+                    <span>Solo colores de línea envasados. Disponibilidad sujeta a confirmación.</span>
+                </div>
+
+                <noscript>
+                    <p class="catalog__error">Activa JavaScript para ver el catálogo, o escríbenos al <a href="https://wa.me/50586814778">WhatsApp +505 8681-4778</a>.</p>
+                </noscript>
+
+                <!-- Contenedor dinámico: las tarjetas se crean desde js/catalogo.js -->
+                <div class="products__grid" id="products-grid"></div>
+
+                <div class="catalog__empty" id="catalog-empty" hidden>
+                    <strong>No encontramos productos con esa búsqueda</strong>
+                    <p>Prueba con otro nombre o clave, o revisa todas las líneas.</p>
+                    <button type="button" class="btn btn--outline btn--sm" id="catalog-reset">Ver todo el catálogo</button>
                 </div>
             </div>
         </section>
@@ -153,7 +208,8 @@
                                 <span class="contact__icon" aria-hidden="true">📍</span>
                                 <div>
                                     <strong>Dirección del establecimiento</strong>
-                                    <p id="store-address">4c, De la Clinica Don Bosco, Al Este y 20Vrs Al Sur, Managua</p>
+                                    <p id="store-address">4c. de la Clínica Don Bosco al Este, 20 vrs al Sur, Managua</p>
+                                    <p class="contact__perk">Visítanos y retira en tienda con descuento especial.</p>
                                 </div>
                             </li>
 
@@ -161,7 +217,7 @@
                                 <span class="contact__icon" aria-hidden="true">📞</span>
                                 <div>
                                     <strong>Teléfono de atención</strong>
-                                    <p><a href="tel:+50500000000" id="store-phone">+505 8681-4778</a></p>
+                                    <p><a href="tel:+50586814778" id="store-phone">+505 8681-4778</a></p>
                                 </div>
                             </li>
 
@@ -247,7 +303,55 @@
         </div>
     </footer>
 
-    <!-- Enlace a nuestro archivo JavaScript -->
+    <!-- =====================================================================
+         PANEL DE PRE-COTIZACIÓN
+    ====================================================================== -->
+    <div class="drawer-overlay" id="cart-overlay"></div>
+
+    <aside class="drawer" id="cart-drawer" role="dialog" aria-modal="true" aria-labelledby="cart-title" inert>
+        <div class="drawer__header">
+            <div>
+                <h2 id="cart-title">Tu pre-cotización</h2>
+                <span id="cart-summary" role="status"></span>
+            </div>
+            <button type="button" class="drawer__close" id="cart-close" aria-label="Cerrar pre-cotización">×</button>
+        </div>
+
+        <div class="drawer__body">
+            <div class="drawer__empty" id="cart-empty">
+                <strong>Tu lista está vacía</strong>
+                <p>Agrega productos del catálogo para solicitar tu cotización.</p>
+            </div>
+            <ul id="cart-list"></ul>
+        </div>
+
+        <div class="drawer__footer">
+            <div class="perk perk--compact">
+                <span class="perk__icon" aria-hidden="true">%</span>
+                <div>
+                    <strong>Descuento especial al retirar en tienda</strong>
+                    <p>4c. de la Clínica Don Bosco al Este, 20 vrs al Sur, Managua.</p>
+                </div>
+            </div>
+
+            <a href="#" id="cart-send" class="btn btn--whatsapp btn--full" target="_blank" rel="noopener noreferrer">
+                Solicitar cotización por WhatsApp
+            </a>
+
+            <div class="drawer__links">
+                <button type="button" class="link-btn" id="cart-continue">Seguir viendo productos</button>
+                <button type="button" class="link-btn link-btn--danger" id="cart-clear">Vaciar lista</button>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Aviso breve al agregar productos -->
+    <div class="toast" id="toast" role="status"></div>
+
+    <!-- Datos y lógica (el orden importa) -->
+    <script src="data/productos.js"></script>
     <script src="js/scripts.js"></script>
+    <script src="js/catalogo.js"></script>
+    <script src="js/carrito.js"></script>
 </body>
 </html>
