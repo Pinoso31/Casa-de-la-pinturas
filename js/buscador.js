@@ -22,9 +22,11 @@ const Buscador = (() => {
 
     // Palabras de uso común que no aparecen en el nombre del producto
     const PALABRAS_POR_LINEA = {
-        "Vinílicas / Agua": "pintura pared",
-        "Anticorrosivos": "pintura metal hierro",
-        "Brochas y Felpas (Herramientas)": "pulgadas"
+        "Látex": "pintura pared vinilica agua",
+        "Aceite": "pintura esmalte",
+        "Anticorrosivo": "pintura metal hierro",
+        "Brochas": "pulgadas",
+        "Felpas": "pulgadas rodillo"
     };
 
     // Igual que las anteriores, según una palabra del nombre
@@ -52,6 +54,9 @@ const Buscador = (() => {
         const propias = [
             ...separarPalabras(articulo.descripcion),
             ...separarPalabras(articulo.presentacion),
+            // Las fracciones se guardan enteras para encontrar "3/8" o "1/2"
+            ...normalizar(articulo.presentacion).split(/[\s"]+/).filter(parte => parte.includes("/")),
+            ...separarPalabras(articulo.marca),
             ...separarPalabras(codigo),
             codigo,
             codigo.replace(/-/g, "")

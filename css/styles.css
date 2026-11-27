@@ -759,8 +759,17 @@ body.no-scroll {
 .product-card__image {
     width: 100%;
     height: 100%;
-    object-fit: cover;
+    object-fit: contain;
     transition: transform 0.55s ease;
+}
+
+/* Las fotos traen fondo blanco; los envases van centrados y admiten recorte lateral */
+.product-card__image-box {
+    background-color: #FFFFFF;
+}
+
+.product-card__image-box[data-tipo="envase"] .product-card__image[src*="vteximg"] {
+    object-fit: cover;
 }
 
 .product-card:hover .product-card__image {
@@ -887,6 +896,10 @@ body.no-scroll {
     color: #B45309;
 }
 
+.stock--consulta {
+    color: var(--color-text-muted);
+}
+
 .qty {
     display: inline-flex;
     align-items: stretch;
@@ -995,17 +1008,95 @@ body.no-scroll {
 }
 
 .detail__media {
+    --escala: 1;
     position: relative;
     min-height: min(400px, 75vh);
-    background-color: #F1F5F9;
+    overflow: hidden;
+    background-color: #FFFFFF;
+    container-type: size;
 }
 
+/* Recuadro cuadrado y centrado: ningún envase se corta, en escritorio ni en móvil */
 .detail__media img {
     position: absolute;
     inset: 0;
-    width: 100%;
-    height: 100%;
+    margin: auto;
+    width: min(100cqw, 100cqh);
+    height: min(100cqw, 100cqh);
+    object-fit: contain;
+    /* Los envases crecen o se encogen desde la base, como en un estante */
+    scale: var(--escala);
+    transform-origin: center 80%;
+    transition: scale 0.45s cubic-bezier(0.34, 1.4, 0.64, 1);
+}
+
+.detail__media[data-tamano="cuarto"] { --escala: 0.68; }
+.detail__media[data-tamano="galon"] { --escala: 0.85; }
+.detail__media[data-tamano="cubeta"] { --escala: 1; }
+
+.detail__media[data-tamano]:not([data-tamano=""]) img[src*="vteximg"] {
     object-fit: cover;
+}
+
+.detail__size,
+.detail__note {
+    position: absolute;
+    z-index: 1;
+    border-radius: 50px;
+    font-weight: 700;
+}
+
+.detail__size {
+    top: 0.85rem;
+    left: 0.85rem;
+    padding: 0.3rem 0.85rem;
+    font-size: 0.82rem;
+    color: #FFFFFF;
+    background-color: var(--color-primary);
+}
+
+.detail__note {
+    bottom: 0.65rem;
+    left: 0.85rem;
+    padding: 0.2rem 0.7rem;
+    font-size: 0.72rem;
+    color: var(--color-text-muted);
+    background-color: rgba(241, 245, 249, 0.92);
+}
+
+.detail__note[hidden],
+.features [hidden] {
+    display: none;
+}
+
+.features {
+    font-size: 0.9rem;
+    color: var(--color-text-muted);
+}
+
+.features h4 {
+    margin-bottom: 0.35rem;
+    font-size: 0.78rem;
+    color: var(--color-text);
+}
+
+.features ul {
+    margin: 0.55rem 0;
+    padding-left: 1.1rem;
+    list-style: disc;
+}
+
+.features dl > div {
+    display: flex;
+    gap: 0.75rem;
+    padding: 0.4rem 0;
+    border-top: 1px solid var(--color-border);
+}
+
+.features dt {
+    flex: 0 0 90px;
+    font-weight: 700;
+    color: var(--color-text);
 }
 
 .detail__info {

@@ -87,9 +87,9 @@ const Carrito = (() => {
             partes.push("", `*${valor}*`);
             delGrupo.forEach(linea => {
                 const articulo = articulos.get(linea.cve_art);
-                const nota = articulo.disponible ? "" : " _(sobre pedido)_";
+                const nota = articulo.disponible === false ? " _(sobre pedido)_" : "";
                 partes.push(
-                    `${++numero}. ${articulo.descripcion}${nota}`,
+                    `${++numero}. ${articulo.descripcion} (${articulo.marca})${nota}`,
                     `   Código: ${articulo.cve_art} | ${articulo.presentacion} | Cantidad: ${linea.cantidad}`
                 );
             });
@@ -114,11 +114,11 @@ const Carrito = (() => {
 
         return `
             <li class="cart-item" data-clave="${clave}">
-                <img src="${escaparHTML(articulo.imagen)}" alt="" class="cart-item__image">
+                <img ${atributosImagen(articulo)} alt="" class="cart-item__image">
                 <div class="cart-item__info">
                     <strong>${nombre}</strong>
                     <span>${escaparHTML(articulo.presentacion)} · ${clave}</span>
-                    ${articulo.disponible ? "" : '<span class="stock stock--pedido">Sobre pedido</span>'}
+                    ${articulo.disponible === false ? '<span class="stock stock--pedido">Sobre pedido</span>' : ""}
                     <div class="cart-item__controls">
                         <div class="qty qty--sm">
                             <button type="button" class="qty__btn" data-accion="restar" aria-label="Restar una unidad de ${nombre}"${linea.cantidad <= 1 ? " disabled" : ""}>−</button>

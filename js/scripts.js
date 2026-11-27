@@ -13,6 +13,7 @@ const CONFIG_TIENDA = {
    2. INICIALIZACIÓN CUANDO CARGA EL DOCUMENTO
    ========================================================================== */
 document.addEventListener("DOMContentLoaded", async () => {
+    configurarRespaldoImagenes();
     configurarWhatsAppGeneral();
     configurarMenuMovil();
     configurarEfectosScroll();
@@ -41,6 +42,41 @@ function crearEnlaceWhatsApp(mensaje) {
 function escaparHTML(texto) {
     const reemplazos = { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" };
     return String(texto).replace(/[&<>"']/g, caracter => reemplazos[caracter]);
+}
+
+/**
+ * Atributos HTML de la foto de un artículo, con sus respaldos
+ */
+function atributosImagen(articulo) {
+    return `src="${escaparHTML(articulo.imagen)}" data-respaldo="${escaparHTML(listaRespaldos(articulo))}"`;
+}
+
+/**
+ * Igual que la anterior, sobre una imagen que ya existe en la página
+ */
+function prepararImagen(imagen, articulo) {
+    imagen.dataset.respaldo = listaRespaldos(articulo);
+    imagen.src = articulo.imagen;
+}
+
+function listaRespaldos(articulo) {
+    return [articulo.respaldo, articulo.respaldo_local].filter(Boolean).join(" ");
+}
+
+/**
+ * Si una foto de internet no carga, prueba la siguiente de su lista
+ */
+function configurarRespaldoImagenes() {
+    // El evento "error" no se propaga: se escucha en la fase de captura
+    document.addEventListener("error", evento => {
+        const imagen = evento.target;
+        if (!imagen.matches || !imagen.matches("img[data-respaldo]")) return;
+
+        const [siguiente, ...resto] = imagen.dataset.respaldo.split(" ").filter(Boolean);
+        if (!siguiente) return;
+        imagen.dataset.respaldo = resto.join(" ");
+        imagen.src = siguiente;
+    }, true);
 }
 
 /**

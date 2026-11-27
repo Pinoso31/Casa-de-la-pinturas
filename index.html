@@ -91,10 +91,13 @@
 
                     <!-- Accesos rápidos a las líneas del catálogo -->
                     <nav class="hero__lines" aria-label="Explorar el catálogo por línea">
-                        <a href="#productos" class="line-chip" data-filtrar="vinilicas"><i style="background-color: #0284C7;"></i>Vinílicas / Agua</a>
-                        <a href="#productos" class="line-chip" data-filtrar="esmaltes"><i style="background-color: #F97316;"></i>Aceite / Esmaltes</a>
-                        <a href="#productos" class="line-chip" data-filtrar="anticorrosivos"><i style="background-color: #991B1B;"></i>Anticorrosivos</a>
-                        <a href="#productos" class="line-chip" data-filtrar="herramientas"><i style="background-color: #10B981;"></i>Brochas y Felpas</a>
+                        <a href="#productos" class="line-chip" data-filtrar="latex"><i style="background-color: #0284C7;"></i>Látex</a>
+                        <a href="#productos" class="line-chip" data-filtrar="aceite"><i style="background-color: #F97316;"></i>Aceite</a>
+                        <a href="#productos" class="line-chip" data-filtrar="anticorrosivo"><i style="background-color: #991B1B;"></i>Anticorrosivo</a>
+                        <a href="#productos" class="line-chip" data-filtrar="madera"><i style="background-color: #92400E;"></i>Madera</a>
+                        <a href="#productos" class="line-chip" data-filtrar="especialidades"><i style="background-color: #7C3AED;"></i>Especialidades</a>
+                        <a href="#productos" class="line-chip" data-filtrar="brochas"><i style="background-color: #10B981;"></i>Brochas</a>
+                        <a href="#productos" class="line-chip" data-filtrar="felpas"><i style="background-color: #EAB308;"></i>Felpas</a>
                     </nav>
 
                     <!-- Incentivo por visita a la tienda -->
@@ -303,8 +306,10 @@
         <button type="button" class="detail__close" id="detail-close" aria-label="Cerrar detalle">×</button>
 
         <div class="detail__content" id="detail-content">
-            <div class="detail__media">
+            <div class="detail__media" id="detail-media">
                 <img id="detail-image" alt="">
+                <span class="detail__size" id="detail-size" aria-hidden="true"></span>
+                <span class="detail__note" id="detail-image-note" hidden>Foto de referencia</span>
             </div>
 
             <div class="detail__info">
@@ -317,6 +322,13 @@
                     <legend id="detail-options-label">Presentación</legend>
                     <div class="options__list" id="detail-options"></div>
                 </fieldset>
+
+                <section class="features" aria-labelledby="detail-features-title">
+                    <h4 id="detail-features-title">Características</h4>
+                    <p id="detail-use"></p>
+                    <ul id="detail-benefits"></ul>
+                    <dl id="detail-specs"></dl>
+                </section>
 
                 <form class="detail__actions" id="detail-form" novalidate>
                     <div class="qty">

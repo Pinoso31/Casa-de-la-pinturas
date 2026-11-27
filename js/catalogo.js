@@ -6,14 +6,14 @@
 const Catalogo = (() => {
     // `valor` debe coincidir exactamente con el campo `linea` de los datos
     const LINEAS = [
-        { id: "vinilicas", valor: "Vinílicas / Agua" },
-        { id: "esmaltes", valor: "Aceite / Esmaltes" },
-        { id: "anticorrosivos", valor: "Anticorrosivos" },
-        { id: "herramientas", valor: "Brochas y Felpas (Herramientas)" }
+        { id: "latex", valor: "Látex" },
+        { id: "aceite", valor: "Aceite" },
+        { id: "anticorrosivo", valor: "Anticorrosivo" },
+        { id: "madera", valor: "Madera" },
+        { id: "especialidades", valor: "Especialidades" },
+        { id: "brochas", valor: "Brochas" },
+        { id: "felpas", valor: "Felpas" }
     ];
-
-    // Orden de las presentaciones; las medidas de herramientas van por tamaño
-    const ORDEN_PRESENTACION = { "Cuarto": 1, "Galón": 2, "Cubeta": 3 };
 
     const estado = { linea: "todos", busqueda: "" };
     let grupos = [];
@@ -39,31 +39,31 @@ const Catalogo = (() => {
             const linea = LINEAS.find(l => l.valor === producto.linea);
             if (!linea) return;
 
-            const llave = `${linea.id}|${producto.descripcion}`;
+            const llave = `${linea.id}|${producto.marca}|${producto.descripcion}`;
             if (!mapa.has(llave)) {
                 mapa.set(llave, { linea, descripcion: producto.descripcion, articulos: [] });
             }
             mapa.get(llave).articulos.push(producto);
         });
 
-        const peso = p => ORDEN_PRESENTACION[p.presentacion] || parseFloat(p.presentacion) || 99;
         const lista = [...mapa.values()];
-        lista.forEach(grupo => grupo.articulos.sort((a, b) => peso(a) - peso(b)));
+        lista.forEach(grupo => grupo.articulos.sort((a, b) => a.orden - b.orden));
         lista.sort((a, b) => LINEAS.indexOf(a.linea) - LINEAS.indexOf(b.linea));
         return lista;
     }
 
-    /** Artículo que se muestra primero: el que esté en stock, si lo hay */
+    /** Artículo que se muestra primero: el galón; en herramientas, la primera medida */
     function articuloInicial(grupo) {
-        return grupo.articulos.find(a => a.disponible) || grupo.articulos[0];
+        return grupo.articulos.find(a => a.tamano === "galon") || grupo.articulos[0];
     }
 
     // La tarjeta solo lleva imagen y nombre; todo lo demás va en el detalle
     function crearTarjeta(grupo, indice) {
+        const articulo = articuloInicial(grupo);
         return `
             <article class="product-card" data-grupo="${indice}">
-                <div class="product-card__image-box">
-                    <img src="${escaparHTML(articuloInicial(grupo).imagen)}" alt="" class="product-card__image" loading="lazy">
+                <div class="product-card__image-box" data-tipo="${articulo.tamano ? "envase" : "herramienta"}">
+                    <img ${atributosImagen(articulo)} alt="" class="product-card__image" loading="lazy">
                 </div>
                 <h3 class="product-card__title">
                     <button type="button" class="product-card__open" aria-haspopup="dialog">${escaparHTML(grupo.descripcion)}</button>
@@ -79,15 +79,49 @@ const Catalogo = (() => {
         return grupoAbierto.articulos.find(a => a.cve_art === marcado.value);
     }
 
+    /** Cambia la foto con una transición y ajusta su escala según el envase */
+    function mostrarImagen(articulo) {
+        prepararImagen(detalle.imagen, articulo);
+        detalle.media.dataset.tamano = articulo.tamano || "";
+        detalle.medida.textContent = articulo.presentacion;
+        detalle.nota.hidden = !articulo.referencial;
+
+        if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+        detalle.imagen.animate(
+            [{ opacity: 0, translate: "28px 0" }, { opacity: 1, translate: "0 0" }],
+            { duration: 380, easing: "cubic-bezier(0.22, 1, 0.36, 1)" }
+        );
+    }
+
+    function textoDisponibilidad({ disponible }) {
+        if (disponible === true) return { texto: "En stock", clase: "" };
+        if (disponible === false) return { texto: "Sobre pedido", clase: "stock--pedido" };
+        return { texto: "Consultar disponibilidad", clase: "stock--consulta" };
+    }
+
     /** Muestra código, foto y disponibilidad de la presentación elegida */
     function actualizarDetalle() {
         const articulo = articuloSeleccionado();
+        const estado = textoDisponibilidad(articulo);
 
         detalle.codigo.textContent = articulo.cve_art;
-        detalle.imagen.src = articulo.imagen;
-        detalle.estado.textContent = articulo.disponible ? "En stock" : "Sobre pedido";
-        detalle.estado.classList.toggle("stock--pedido", !articulo.disponible);
+        mostrarImagen(articulo);
+        detalle.estado.textContent = estado.texto;
+        detalle.estado.className = `stock ${estado.clase}`.trim();
         actualizarEnlaceCotizacion();
+    }
+
+    /** Características del producto: son iguales en todas sus presentaciones */
+    function mostrarCaracteristicas(articulo) {
+        detalle.uso.textContent = articulo.uso;
+        detalle.beneficios.innerHTML = articulo.beneficios
+            .map(texto => `<li>${escaparHTML(texto)}</li>`).join("");
+
+        const datos = [["Rendimiento", articulo.rendimiento], ["Secado", articulo.secado]]
+            .filter(([, valor]) => valor);
+        detalle.datos.innerHTML = datos
+            .map(([nombre, valor]) => `<div><dt>${nombre}</dt><dd>${escaparHTML(valor)}</dd></div>`).join("");
+        detalle.datos.hidden = !datos.length;
     }
 
     /** El botón de WhatsApp siempre refleja la presentación y cantidad visibles */
@@ -106,17 +140,20 @@ const Catalogo = (() => {
         const inicial = grupoAbierto.articulos.find(a => a.cve_art === tarjeta.dataset.codigo)
             || articuloInicial(grupoAbierto);
 
-        detalle.categoria.textContent = grupoAbierto.linea.valor;
+        detalle.categoria.textContent = `${grupoAbierto.linea.valor} · ${inicial.marca}`;
         detalle.nombre.textContent = grupoAbierto.descripcion;
         detalle.imagen.alt = grupoAbierto.descripcion;
-        detalle.etiqueta.textContent = grupoAbierto.linea.id === "herramientas" ? "Medida" : "Presentación";
+        detalle.etiqueta.textContent = inicial.etiqueta || "Presentación";
+        mostrarCaracteristicas(inicial);
         detalle.opciones.innerHTML = grupoAbierto.articulos.map(articulo => `
-            <label class="option${articulo.disponible ? "" : " option--pedido"}">
+            <label class="option${articulo.disponible === false ? " option--pedido" : ""}">
                 <input type="radio" name="presentacion" value="${escaparHTML(articulo.cve_art)}"${articulo === inicial ? " checked" : ""}>
                 <span>${escaparHTML(articulo.presentacion)}</span>
             </label>
         `).join("");
         detalle.cantidad.value = 1;
+        // Se descargan antes las fotos de todos los tamaños para que el cambio sea fluido
+        grupoAbierto.articulos.forEach(articulo => { new Image().src = articulo.imagen; });
         actualizarDetalle();
 
         document.body.classList.add("no-scroll");
@@ -130,7 +167,13 @@ const Catalogo = (() => {
             ventana: porId("product-detail"),
             contenido: porId("detail-content"),
             cerrar: porId("detail-close"),
+            media: porId("detail-media"),
             imagen: porId("detail-image"),
+            medida: porId("detail-size"),
+            nota: porId("detail-image-note"),
+            uso: porId("detail-use"),
+            beneficios: porId("detail-benefits"),
+            datos: porId("detail-specs"),
             categoria: porId("detail-category"),
             nombre: porId("detail-title"),
             codigo: porId("detail-code"),
@@ -198,7 +241,7 @@ const Catalogo = (() => {
             // Si la búsqueda apunta a ciertas presentaciones (un código, "cubeta",
             // una medida), el detalle se abre en una de ellas
             const preferido = coinciden && coinciden.length < grupo.articulos.length
-                ? coinciden.find(a => a.disponible) || coinciden[0]
+                ? coinciden.find(a => a.tamano === "galon") || coinciden[0]
                 : null;
             tarjeta.dataset.codigo = preferido ? preferido.cve_art : "";
         });
