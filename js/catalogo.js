@@ -32,11 +32,6 @@ const Catalogo = (() => {
         return PRODUCTOS_SAE;
     }
 
-    /** Minúsculas y sin tildes, para comparar textos */
-    function normalizar(texto) {
-        return String(texto).normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase().trim();
-    }
-
     function agruparProductos(productos) {
         const mapa = new Map();
 
@@ -107,7 +102,7 @@ const Catalogo = (() => {
         grupoAbierto = grupos[tarjeta.dataset.grupo];
         botonOrigen = tarjeta.querySelector(".product-card__open");
 
-        // Si se llegó buscando un código, se abre en esa presentación
+        // La búsqueda puede haber apuntado a una presentación concreta
         const inicial = grupoAbierto.articulos.find(a => a.cve_art === tarjeta.dataset.codigo)
             || articuloInicial(grupoAbierto);
 
@@ -192,30 +187,23 @@ const Catalogo = (() => {
     /* --------------------------- Filtros y búsqueda ----------------------- */
 
     function aplicarFiltros() {
-        const terminos = normalizar(estado.busqueda).split(/\s+/).filter(Boolean);
-        let visibles = 0;
+        const deLaLinea = grupos.filter(g => estado.linea === "todos" || g.linea.id === estado.linea);
+        const resultado = Buscador.buscar(deLaLinea, estado.busqueda);
 
         document.querySelectorAll("#products-grid .product-card").forEach(tarjeta => {
             const grupo = grupos[tarjeta.dataset.grupo];
-            const claves = grupo.articulos.map(a => normalizar(a.cve_art));
-            const texto = [normalizar(grupo.descripcion), ...claves, ...claves.map(c => c.replace(/-/g, ""))].join(" ");
+            const coinciden = resultado.get(grupo);
+            tarjeta.hidden = !coinciden;
 
-            const coincideLinea = estado.linea === "todos" || grupo.linea.id === estado.linea;
-            const coincide = coincideLinea && terminos.every(t => texto.includes(t));
-
-            tarjeta.hidden = !coincide;
-            if (!coincide) return;
-            visibles++;
-
-            // Si se busca un código concreto, se recuerda para abrir esa presentación
-            const terminosClave = terminos.filter(t => t.length >= 6 && /\d/.test(t));
-            const porClave = grupo.articulos.filter(a => {
-                const clave = normalizar(a.cve_art);
-                return terminosClave.some(t => clave.includes(t) || clave.replace(/-/g, "").includes(t));
-            });
-            tarjeta.dataset.codigo = porClave.length === 1 ? porClave[0].cve_art : "";
+            // Si la búsqueda apunta a ciertas presentaciones (un código, "cubeta",
+            // una medida), el detalle se abre en una de ellas
+            const preferido = coinciden && coinciden.length < grupo.articulos.length
+                ? coinciden.find(a => a.disponible) || coinciden[0]
+                : null;
+            tarjeta.dataset.codigo = preferido ? preferido.cve_art : "";
         });
 
+        const visibles = resultado.size;
         document.getElementById("catalog-count").textContent =
             visibles === 1 ? "1 producto" : `${visibles} productos`;
         document.getElementById("catalog-empty").hidden = visibles > 0;
@@ -253,7 +241,12 @@ const Catalogo = (() => {
 
         document.getElementById("catalog-search").addEventListener("input", evento => {
             estado.busqueda = evento.target.value;
-            aplicarFiltros();
+            // Al escribir se busca en todo el catálogo; luego una pestaña puede acotar
+            if (estado.busqueda.trim() && estado.linea !== "todos") {
+                seleccionarLinea("todos");
+            } else {
+                aplicarFiltros();
+            }
         });
 
         document.getElementById("catalog-reset").addEventListener("click", () => {
