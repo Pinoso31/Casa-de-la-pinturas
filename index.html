@@ -136,7 +136,7 @@
                     <span class="section__subtitle">Catálogo y pre-cotización</span>
                     <h2 class="section__title">Nuestros Productos</h2>
                     <p class="section__description">
-                        Elige presentación y cantidad, agrega a tu lista y envíala por WhatsApp. Te respondemos con precios y disponibilidad.
+                        Elige un producto para ver sus detalles, agrégalo a tu lista y envíala por WhatsApp. Te respondemos con precios y disponibilidad.
                     </p>
                 </div>
 
@@ -147,7 +147,7 @@
                             <circle cx="11" cy="11" r="7"></circle>
                             <path d="m20 20-3.5-3.5"></path>
                         </svg>
-                        <input type="search" id="catalog-search" placeholder="Buscar por nombre o clave" aria-label="Buscar productos por nombre o clave" autocomplete="off">
+                        <input type="search" id="catalog-search" placeholder="Buscar por nombre o código" aria-label="Buscar productos por nombre o código" autocomplete="off">
                     </div>
                     <div class="catalog__tabs" id="catalog-tabs" role="group" aria-label="Filtrar por línea"></div>
                 </div>
@@ -166,7 +166,7 @@
 
                 <div class="catalog__empty" id="catalog-empty" hidden>
                     <strong>No encontramos productos con esa búsqueda</strong>
-                    <p>Prueba con otro nombre o clave, o revisa todas las líneas.</p>
+                    <p>Prueba con otro nombre o código, o revisa todas las líneas.</p>
                     <button type="button" class="btn btn--outline btn--sm" id="catalog-reset">Ver todo el catálogo</button>
                 </div>
             </div>
@@ -295,6 +295,40 @@
             </div>
         </div>
     </footer>
+
+    <!-- =====================================================================
+         DETALLE DEL PRODUCTO (se llena desde js/catalogo.js)
+    ====================================================================== -->
+    <dialog class="detail" id="product-detail" aria-labelledby="detail-title">
+        <button type="button" class="detail__close" id="detail-close" aria-label="Cerrar detalle">×</button>
+
+        <div class="detail__content" id="detail-content">
+            <div class="detail__media">
+                <img id="detail-image" alt="">
+            </div>
+
+            <div class="detail__info">
+                <span class="detail__category" id="detail-category"></span>
+                <h3 class="detail__title" id="detail-title"></h3>
+                <p class="detail__code">Código: <strong id="detail-code"></strong></p>
+                <p class="stock" id="detail-stock" aria-live="polite"></p>
+
+                <fieldset class="options">
+                    <legend id="detail-options-label">Presentación</legend>
+                    <div class="options__list" id="detail-options"></div>
+                </fieldset>
+
+                <form class="detail__actions" id="detail-form" novalidate>
+                    <div class="qty">
+                        <button type="button" class="qty__btn" data-accion="restar" aria-label="Restar una unidad">−</button>
+                        <input type="number" class="qty__input" id="detail-qty" value="1" min="1" max="999" step="1" inputmode="numeric" aria-label="Cantidad">
+                        <button type="button" class="qty__btn" data-accion="sumar" aria-label="Sumar una unidad">+</button>
+                    </div>
+                    <button type="submit" class="btn btn--primary">Agregar a mi lista</button>
+                </form>
+            </div>
+        </div>
+    </dialog>
 
     <!-- =====================================================================
          PANEL DE PRE-COTIZACIÓN

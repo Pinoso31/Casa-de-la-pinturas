@@ -12,7 +12,7 @@
                    Brochas y Felpas (Herramientas)
      presentacion  Cuarto | Galón | Cubeta (herramientas: su medida)
      rendimiento   Texto informativo; "" si no aplica
-     disponible    true / false
+     disponible    true = "En stock" / false = "Sobre pedido"
      imagen        Ruta o URL de la imagen
 
    IMPORTANTE: claves, rendimientos y existencias son ficticios y deben

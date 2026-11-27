@@ -48,7 +48,7 @@ const Carrito = (() => {
 
     function agregar(cveArt, cantidad) {
         const articulo = articulos.get(cveArt);
-        if (!articulo || !articulo.disponible) return;
+        if (!articulo) return;
 
         const existente = lineas.find(linea => linea.cve_art === cveArt);
         if (existente) {
@@ -86,10 +86,10 @@ const Carrito = (() => {
             partes.push("", `*${valor}*`);
             delGrupo.forEach(linea => {
                 const articulo = articulos.get(linea.cve_art);
-                const nota = articulo.disponible ? "" : " _(agotado, consultar)_";
+                const nota = articulo.disponible ? "" : " _(sobre pedido)_";
                 partes.push(
                     `${++numero}. ${articulo.descripcion}${nota}`,
-                    `   Clave: ${articulo.cve_art} | ${articulo.presentacion} | Cantidad: ${linea.cantidad}`
+                    `   Código: ${articulo.cve_art} | ${articulo.presentacion} | Cantidad: ${linea.cantidad}`
                 );
             });
         });
@@ -117,7 +117,7 @@ const Carrito = (() => {
                 <div class="cart-item__info">
                     <strong>${nombre}</strong>
                     <span>${escaparHTML(articulo.presentacion)} · ${clave}</span>
-                    ${articulo.disponible ? "" : '<span class="stock stock--agotado">Agotado, se consultará</span>'}
+                    ${articulo.disponible ? "" : '<span class="stock stock--pedido">Sobre pedido</span>'}
                     <div class="cart-item__controls">
                         <div class="qty qty--sm">
                             <button type="button" class="qty__btn" data-accion="restar" aria-label="Restar una unidad de ${nombre}"${linea.cantidad <= 1 ? " disabled" : ""}>−</button>

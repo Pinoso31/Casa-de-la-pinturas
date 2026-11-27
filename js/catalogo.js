@@ -1,6 +1,7 @@
 /* ==========================================================================
    CATÁLOGO INTERACTIVO
-   Carga los artículos, los agrupa en tarjetas y aplica filtros y búsqueda.
+   Carga los artículos, los agrupa en tarjetas, aplica filtros y búsqueda, y
+   muestra el detalle del producto elegido.
    ========================================================================== */
 const Catalogo = (() => {
     // `valor` debe coincidir exactamente con el campo `linea` de los datos
@@ -16,6 +17,9 @@ const Catalogo = (() => {
 
     const estado = { linea: "todos", busqueda: "" };
     let grupos = [];
+    let detalle = {};           // elementos de la ventana de detalle
+    let grupoAbierto = null;
+    let botonOrigen = null;
 
     /**
      * ÚNICO punto de acceso a los datos. Al conectar la API sobre SAE, basta
@@ -54,83 +58,125 @@ const Catalogo = (() => {
         return lista;
     }
 
+    /** Artículo que se muestra primero: el que esté en stock, si lo hay */
+    function articuloInicial(grupo) {
+        return grupo.articulos.find(a => a.disponible) || grupo.articulos[0];
+    }
+
+    // La tarjeta solo lleva imagen y nombre; todo lo demás va en el detalle
     function crearTarjeta(grupo, indice) {
-        const inicial = grupo.articulos.find(a => a.disponible) || grupo.articulos[0];
-        const etiquetaOpciones = grupo.linea.id === "herramientas" ? "Medida" : "Presentación";
-        const nombre = escaparHTML(grupo.descripcion);
-
-        const opciones = grupo.articulos.map(articulo => `
-            <label class="option${articulo.disponible ? "" : " option--agotado"}">
-                <input type="radio" name="presentacion-${indice}" value="${escaparHTML(articulo.cve_art)}"${articulo === inicial ? " checked" : ""}>
-                <span>${escaparHTML(articulo.presentacion)}</span>
-            </label>
-        `).join("");
-
         return `
             <article class="product-card" data-grupo="${indice}">
                 <div class="product-card__image-box">
-                    <span class="product-card__tag">${escaparHTML(grupo.linea.valor)}</span>
-                    <img src="${escaparHTML(inicial.imagen)}" alt="${nombre}" class="product-card__image" loading="lazy">
+                    <img src="${escaparHTML(articuloInicial(grupo).imagen)}" alt="" class="product-card__image" loading="lazy">
                 </div>
-                <div class="product-card__body">
-                    <h3 class="product-card__title">${nombre}</h3>
-
-                    <fieldset class="options">
-                        <legend>${etiquetaOpciones}</legend>
-                        <div class="options__list">${opciones}</div>
-                    </fieldset>
-
-                    <dl class="specs">
-                        <div class="specs__row">
-                            <dt>Clave</dt>
-                            <dd data-campo="clave"></dd>
-                        </div>
-                        <div class="specs__row" data-campo="fila-rendimiento">
-                            <dt>Rendimiento aprox.</dt>
-                            <dd data-campo="rendimiento"></dd>
-                        </div>
-                    </dl>
-
-                    <p class="stock" data-campo="estado" aria-live="polite"></p>
-
-                    <div class="product-card__footer">
-                        <div class="qty">
-                            <button type="button" class="qty__btn" data-accion="restar" aria-label="Restar una unidad">−</button>
-                            <input type="number" class="qty__input" value="1" min="1" max="999" step="1" inputmode="numeric" aria-label="Cantidad de ${nombre}">
-                            <button type="button" class="qty__btn" data-accion="sumar" aria-label="Sumar una unidad">+</button>
-                        </div>
-                        <button type="button" class="btn btn--primary btn--sm product-card__add" data-accion="agregar"></button>
-                    </div>
-                </div>
+                <h3 class="product-card__title">
+                    <button type="button" class="product-card__open" aria-haspopup="dialog">${escaparHTML(grupo.descripcion)}</button>
+                </h3>
             </article>
         `;
     }
 
-    function articuloSeleccionado(tarjeta) {
-        const grupo = grupos[tarjeta.dataset.grupo];
-        const marcado = tarjeta.querySelector(".options input:checked");
-        return grupo.articulos.find(a => a.cve_art === marcado.value);
+    /* -------------------------- Detalle del producto ---------------------- */
+
+    function articuloSeleccionado() {
+        const marcado = detalle.opciones.querySelector("input:checked");
+        return grupoAbierto.articulos.find(a => a.cve_art === marcado.value);
     }
 
-    /** Muestra clave, rendimiento y disponibilidad de la presentación elegida */
-    function actualizarTarjeta(tarjeta) {
-        const articulo = articuloSeleccionado(tarjeta);
-        const campo = nombre => tarjeta.querySelector(`[data-campo="${nombre}"]`);
+    /** Muestra código, foto y disponibilidad de la presentación elegida */
+    function actualizarDetalle() {
+        const articulo = articuloSeleccionado();
 
-        campo("clave").textContent = articulo.cve_art;
-        campo("rendimiento").textContent = articulo.rendimiento || "";
-        campo("fila-rendimiento").hidden = !articulo.rendimiento;
-
-        const stock = campo("estado");
-        stock.textContent = articulo.disponible ? "Disponible" : "Agotado por el momento";
-        stock.classList.toggle("stock--agotado", !articulo.disponible);
-
-        const boton = tarjeta.querySelector(".product-card__add");
-        boton.disabled = !articulo.disponible;
-        boton.textContent = articulo.disponible ? "Agregar" : "Agotado";
-
-        tarjeta.querySelector(".product-card__image").src = articulo.imagen;
+        detalle.codigo.textContent = articulo.cve_art;
+        detalle.imagen.src = articulo.imagen;
+        detalle.estado.textContent = articulo.disponible ? "En stock" : "Sobre pedido";
+        detalle.estado.classList.toggle("stock--pedido", !articulo.disponible);
     }
+
+    function abrirDetalle(tarjeta) {
+        grupoAbierto = grupos[tarjeta.dataset.grupo];
+        botonOrigen = tarjeta.querySelector(".product-card__open");
+
+        // Si se llegó buscando un código, se abre en esa presentación
+        const inicial = grupoAbierto.articulos.find(a => a.cve_art === tarjeta.dataset.codigo)
+            || articuloInicial(grupoAbierto);
+
+        detalle.categoria.textContent = grupoAbierto.linea.valor;
+        detalle.nombre.textContent = grupoAbierto.descripcion;
+        detalle.imagen.alt = grupoAbierto.descripcion;
+        detalle.etiqueta.textContent = grupoAbierto.linea.id === "herramientas" ? "Medida" : "Presentación";
+        detalle.opciones.innerHTML = grupoAbierto.articulos.map(articulo => `
+            <label class="option${articulo.disponible ? "" : " option--pedido"}">
+                <input type="radio" name="presentacion" value="${escaparHTML(articulo.cve_art)}"${articulo === inicial ? " checked" : ""}>
+                <span>${escaparHTML(articulo.presentacion)}</span>
+            </label>
+        `).join("");
+        detalle.cantidad.value = 1;
+        actualizarDetalle();
+
+        document.body.classList.add("no-scroll");
+        detalle.ventana.showModal();
+        detalle.contenido.scrollTop = 0;
+    }
+
+    function configurarDetalle() {
+        const porId = id => document.getElementById(id);
+        detalle = {
+            ventana: porId("product-detail"),
+            contenido: porId("detail-content"),
+            cerrar: porId("detail-close"),
+            imagen: porId("detail-image"),
+            categoria: porId("detail-category"),
+            nombre: porId("detail-title"),
+            codigo: porId("detail-code"),
+            estado: porId("detail-stock"),
+            etiqueta: porId("detail-options-label"),
+            opciones: porId("detail-options"),
+            formulario: porId("detail-form"),
+            cantidad: porId("detail-qty")
+        };
+
+        detalle.cerrar.addEventListener("click", () => detalle.ventana.close());
+
+        // Clic en el fondo oscuro (debe empezar y terminar fuera de la ventana)
+        let presionadoEnFondo = false;
+        detalle.ventana.addEventListener("pointerdown", evento => {
+            presionadoEnFondo = evento.target === detalle.ventana;
+        });
+        detalle.ventana.addEventListener("click", evento => {
+            if (presionadoEnFondo && evento.target === detalle.ventana) detalle.ventana.close();
+        });
+
+        // Se dispara con cualquier forma de cierre, incluida la tecla Escape
+        detalle.ventana.addEventListener("close", () => {
+            document.body.classList.remove("no-scroll");
+            botonOrigen.focus({ preventScroll: true });
+        });
+
+        detalle.opciones.addEventListener("change", actualizarDetalle);
+
+        detalle.cantidad.addEventListener("change", () => {
+            detalle.cantidad.value = limitarCantidad(detalle.cantidad.value);
+        });
+
+        detalle.formulario.addEventListener("click", evento => {
+            const boton = evento.target.closest("button[data-accion]");
+            if (!boton) return;
+            const paso = boton.dataset.accion === "sumar" ? 1 : -1;
+            detalle.cantidad.value = limitarCantidad(limitarCantidad(detalle.cantidad.value) + paso);
+        });
+
+        detalle.formulario.addEventListener("submit", evento => {
+            evento.preventDefault();
+            const codigo = articuloSeleccionado().cve_art;
+            const cantidad = limitarCantidad(detalle.cantidad.value);
+            detalle.ventana.close();
+            Carrito.agregar(codigo, cantidad);
+        });
+    }
+
+    /* --------------------------- Filtros y búsqueda ----------------------- */
 
     function aplicarFiltros() {
         const terminos = normalizar(estado.busqueda).split(/\s+/).filter(Boolean);
@@ -148,17 +194,13 @@ const Catalogo = (() => {
             if (!coincide) return;
             visibles++;
 
-            // Si se busca una clave concreta, se selecciona esa presentación
+            // Si se busca un código concreto, se recuerda para abrir esa presentación
             const terminosClave = terminos.filter(t => t.length >= 6 && /\d/.test(t));
             const porClave = grupo.articulos.filter(a => {
                 const clave = normalizar(a.cve_art);
                 return terminosClave.some(t => clave.includes(t) || clave.replace(/-/g, "").includes(t));
             });
-            if (porClave.length === 1) {
-                const radio = [...tarjeta.querySelectorAll(".options input")].find(r => r.value === porClave[0].cve_art);
-                radio.checked = true;
-                actualizarTarjeta(tarjeta);
-            }
+            tarjeta.dataset.codigo = porClave.length === 1 ? porClave[0].cve_art : "";
         });
 
         document.getElementById("catalog-count").textContent =
@@ -214,26 +256,10 @@ const Catalogo = (() => {
             });
         });
 
-        grid.addEventListener("change", evento => {
-            const tarjeta = evento.target.closest(".product-card");
-            if (evento.target.matches(".options input")) actualizarTarjeta(tarjeta);
-            if (evento.target.matches(".qty__input")) evento.target.value = limitarCantidad(evento.target.value);
-        });
-
+        // El botón del nombre cubre toda la tarjeta
         grid.addEventListener("click", evento => {
-            const boton = evento.target.closest("button[data-accion]");
-            if (!boton) return;
-
-            const tarjeta = boton.closest(".product-card");
-            const entrada = tarjeta.querySelector(".qty__input");
-            const cantidad = limitarCantidad(entrada.value);
-
-            if (boton.dataset.accion === "sumar") entrada.value = limitarCantidad(cantidad + 1);
-            if (boton.dataset.accion === "restar") entrada.value = limitarCantidad(cantidad - 1);
-            if (boton.dataset.accion === "agregar") {
-                Carrito.agregar(articuloSeleccionado(tarjeta).cve_art, cantidad);
-                entrada.value = 1;
-            }
+            const boton = evento.target.closest(".product-card__open");
+            if (boton) abrirDetalle(boton.closest(".product-card"));
         });
     }
 
@@ -252,9 +278,9 @@ const Catalogo = (() => {
 
         grupos = agruparProductos(productos);
         grid.innerHTML = grupos.map(crearTarjeta).join("");
-        grid.querySelectorAll(".product-card").forEach(actualizarTarjeta);
 
         crearPestanas();
+        configurarDetalle();
         configurarEventos();
         seleccionarLinea("todos");
 
