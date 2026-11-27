@@ -92,6 +92,15 @@ const Catalogo = (() => {
         detalle.imagen.src = articulo.imagen;
         detalle.estado.textContent = articulo.disponible ? "En stock" : "Sobre pedido";
         detalle.estado.classList.toggle("stock--pedido", !articulo.disponible);
+        actualizarEnlaceCotizacion();
+    }
+
+    /** El botón de WhatsApp siempre refleja la presentación y cantidad visibles */
+    function actualizarEnlaceCotizacion() {
+        detalle.whatsapp.href = Carrito.enlaceCotizacion(
+            articuloSeleccionado().cve_art,
+            limitarCantidad(detalle.cantidad.value)
+        );
     }
 
     function abrirDetalle(tarjeta) {
@@ -134,7 +143,8 @@ const Catalogo = (() => {
             etiqueta: porId("detail-options-label"),
             opciones: porId("detail-options"),
             formulario: porId("detail-form"),
-            cantidad: porId("detail-qty")
+            cantidad: porId("detail-qty"),
+            whatsapp: porId("detail-whatsapp")
         };
 
         detalle.cerrar.addEventListener("click", () => detalle.ventana.close());
@@ -156,8 +166,10 @@ const Catalogo = (() => {
 
         detalle.opciones.addEventListener("change", actualizarDetalle);
 
+        detalle.cantidad.addEventListener("input", actualizarEnlaceCotizacion);
         detalle.cantidad.addEventListener("change", () => {
             detalle.cantidad.value = limitarCantidad(detalle.cantidad.value);
+            actualizarEnlaceCotizacion();
         });
 
         detalle.formulario.addEventListener("click", evento => {
@@ -165,6 +177,7 @@ const Catalogo = (() => {
             if (!boton) return;
             const paso = boton.dataset.accion === "sumar" ? 1 : -1;
             detalle.cantidad.value = limitarCantidad(limitarCantidad(detalle.cantidad.value) + paso);
+            actualizarEnlaceCotizacion();
         });
 
         detalle.formulario.addEventListener("submit", evento => {

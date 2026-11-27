@@ -1062,6 +1062,11 @@ body.no-scroll {
     padding-right: 1rem;
 }
 
+/* Cotización directa: ocupa su propia fila */
+.detail__actions .detail__whatsapp {
+    flex-basis: 100%;
+}
+
 /* ==========================================================================
    7. SECCIÓN CONTACTO
    ========================================================================== */
@@ -1690,13 +1695,12 @@ body.no-scroll {
     }
 
     .detail__actions {
-        gap: 0.6rem;
-        padding: 0.9rem 0 1.25rem;
+        gap: 0.55rem;
+        padding: 0.75rem 0 1rem;
     }
 
     .detail__actions .btn {
-        padding-left: 0.5rem;
-        padding-right: 0.5rem;
+        padding: 0.65rem 0.5rem;
         font-size: 0.88rem;
     }
 

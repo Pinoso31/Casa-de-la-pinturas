@@ -37,8 +37,8 @@ const Carrito = (() => {
 
     /* ------------------------------ Operaciones --------------------------- */
 
-    function total() {
-        return lineas.reduce((suma, linea) => suma + linea.cantidad, 0);
+    function total(seleccion = lineas) {
+        return seleccion.reduce((suma, linea) => suma + linea.cantidad, 0);
     }
 
     function actualizar() {
@@ -75,12 +75,13 @@ const Carrito = (() => {
 
     /* -------------------------------- Mensaje ------------------------------ */
 
-    function crearMensaje() {
+    /** Arma el texto para la lista completa o para la selección que se indique */
+    function crearMensaje(seleccion = lineas) {
         const partes = ["*Casa de las Pinturas*", "Solicitud de pre-cotización"];
         let numero = 0;
 
         Catalogo.LINEAS.forEach(({ valor }) => {
-            const delGrupo = lineas.filter(l => articulos.get(l.cve_art).linea === valor);
+            const delGrupo = seleccion.filter(l => articulos.get(l.cve_art).linea === valor);
             if (!delGrupo.length) return;
 
             partes.push("", `*${valor}*`);
@@ -96,7 +97,7 @@ const Carrito = (() => {
 
         partes.push(
             "",
-            `Total de artículos: ${total()}`,
+            `Total de artículos: ${total(seleccion)}`,
             "",
             "Quisiera conocer precios y disponibilidad. Me interesa el descuento especial por visitar y retirar en tienda."
         );
@@ -298,5 +299,10 @@ const Carrito = (() => {
         dibujar();
     }
 
-    return { iniciar, agregar };
+    /** Enlace para cotizar un solo producto, sin modificar la lista */
+    function enlaceCotizacion(cveArt, cantidad) {
+        return crearEnlaceWhatsApp(crearMensaje([{ cve_art: cveArt, cantidad }]));
+    }
+
+    return { iniciar, agregar, enlaceCotizacion };
 })();
